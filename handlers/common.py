@@ -8,7 +8,7 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer("Привет! Я эхобот на aiogram 3. Отправь мне любое сообщение, и я повторю его.",
+    await message.answer("Выбери команду № 1: ",
                          reply_markup=kb1)
 
 @router.message(Command("fox"))
