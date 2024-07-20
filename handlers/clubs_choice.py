@@ -56,7 +56,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 @router.message(ChoiceProfile.championship, F.text.lower() == 'закрыть')
 async def cmd_close(message: types.Message, state: FSMContext):
-    await message.answer("Набор сброшен",
+    await message.answer("Набор сброшен\n"
+                         "Чтобы начать заново, введите команду /start",
                          reply_markup=types.ReplyKeyboardRemove())
     await state.clear()
 
@@ -79,25 +80,22 @@ async def champ_chosen(message: types.Message, state: FSMContext):
 async def not_champ_chosen(message: types.Message):
     await message.answer("Выберите чемпионат из списка: ", reply_markup=make_row_keyboard(champs))
 
+@router.message(ChoiceProfile.club_1, F.text.lower() == 'закрыть')
+async def cmd_close(message: types.Message, state: FSMContext):
+    await message.answer("Набор сброшен\n"
+                         "Чтобы начать заново, введите команду /start",
+                         reply_markup=types.ReplyKeyboardRemove())
+    await state.clear()
 @router.message(ChoiceProfile.club_1)
 async def club_1_chosen(message: types.Message, state: FSMContext):
     await state.update_data(club1=message.text)
     await message.answer("Выберите команду 2: ", reply_markup=make_row_keyboard(clubs))
     await state.set_state(ChoiceProfile.club_2)
 
-@router.message(ChoiceProfile.club_1, F.text.lower() == 'закрыть')
-async def cmd_close(message: types.Message, state: FSMContext):
-    await message.answer("Набор сброшен",
-                         reply_markup=types.ReplyKeyboardRemove())
-    await state.clear()
-
-@router.message(ChoiceProfile.club_1)
-async def not_club_1_chosen(message: types.Message):
-    await message.answer("Выберите команду 1: ", reply_markup=make_row_keyboard(clubs))
-
 @router.message(ChoiceProfile.club_2, F.text.lower() == 'закрыть')
 async def cmd_close(message: types.Message, state: FSMContext):
-    await message.answer("Набор сброшен",
+    await message.answer("Набор сброшен.\n"
+                         "Чтобы начать заново, введите команду /start",
                          reply_markup=types.ReplyKeyboardRemove())
     await state.clear()
 @router.message(ChoiceProfile.club_2)
@@ -108,13 +106,15 @@ async def club_2_chosen(message: types.Message, state: FSMContext):
         await message.answer("Выберите команду 2: ", reply_markup=make_row_keyboard(clubs))
         await state.set_state(ChoiceProfile.club_2)
     else:
-        await message.answer(f"Чемпионат: {club_data['champ']}\n"
-                             f"Команда №1: {club_data['club1']}\n"
-                             f"Команда №2: {message.text}\n"
-                             "Моя работа завершена. Чтобы продолжить введите команду /start",
-                             reply_markup=types.ReplyKeyboardRemove())
-        await state.clear()
-
-@router.message(ChoiceProfile.club_2)
-async def not_club_2_chosen(message: types.Message):
-    await message.answer("Выберите команду 2: ", reply_markup=make_row_keyboard(clubs))
+        if club_data['club1'] in clubs and message.text in clubs:
+            await message.answer(f"Чемпионат: {club_data['champ']}\n"
+                                 f"Команда №1: {club_data['club1']}\n"
+                                 f"Команда №2: {message.text}\n"
+                                 "Моя работа завершена. Чтобы продолжить введите команду /start",
+                                 reply_markup=types.ReplyKeyboardRemove())
+            await state.clear()
+        else:
+            await message.answer("Некорректный выбор команд.\n"
+                                 "Пожалуйста, начните заново, введя команду /start, и выберите команды из предлагаемого списка",
+                                 reply_markup=types.ReplyKeyboardRemove())
+            await state.clear()
