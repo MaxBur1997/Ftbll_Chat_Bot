@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from transliterate import translit
 
 
-def parser(champ, home, guest):
+def pars(champ, home, guest):
     if champ == "Ла Лига":
         champ_tag = 'la-liga'
     if champ == "АПЛ":
@@ -115,12 +115,10 @@ def parser(champ, home, guest):
              "Гости выйграли": win_games_guest, "Гости проиграли": lose_games_guest, "Ничья гостей": draw_games_guest,
              "Очки хозяев": home_scores, "Очки гостей": guest_scores}
 
-    inj_disq = [home_inj_num, home_disq_num, guest_inj_num, guest_disq_num]
+    results_of_pars = [home_inj_num, home_disq_num, guest_inj_num, guest_disq_num, home_pos, guest_pos,
+                       home_scores, guest_scores, games_home_num, games_guest_num,
+                       home_games_home_num, guest_games_guest_num, win_games_home, lose_games_home,
+                       draw_games_home, win_games_guest, lose_games_guest, draw_games_guest,
+                       goals, miss]
 
-    goals_miss = [goals, miss]
-
-    table_pos = [home_pos, guest_pos]
-
-    scores = [home_scores, guest_scores]
-
-    return goals_miss
+    return results_of_pars
