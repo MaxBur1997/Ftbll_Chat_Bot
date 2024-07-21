@@ -1,22 +1,25 @@
 import requests
 from bs4 import BeautifulSoup
 from transliterate import translit
-from champ_translit import *
-from clubs_translit import *
+from translit_file import *
 
 
 def pars(champ, home, guest):
-    if champ == "Ла Лига":
-        champ_tag = la_liga
-    if champ == "АПЛ":
-        champ_tag = apl
-    if champ == "Бундеслига":
-        champ_tag = bundes
-    if champ == "Серия А":
-        champ_tag = seria_a
 
-    home_tag = "barcelona"
-    guest_tag = "valencia"
+    champ_tag = champ_transl[champ]
+
+    if champ == "Ла Лига":
+        home_tag = la_liga_transl[home]
+        guest_tag = la_liga_transl[guest]
+    if champ == "АПЛ":
+        home_tag = apl_transl[home]
+        guest_tag = apl_transl[guest]
+    if champ == "Бундеслига":
+        home_tag = bundes_transl[home]
+        guest_tag = bundes_transl[guest]
+    if champ == "Серия А":
+        home_tag = seria_a_transl[home]
+        guest_tag = seria_a_transl[guest]
 
     home_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/{champ_tag}/")
     guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2023-2024/{champ_tag}/")

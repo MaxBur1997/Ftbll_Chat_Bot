@@ -15,7 +15,6 @@ async def main():
 
     dp.include_router(clubs_choice.router)
 
-
     await dp.start_polling(bot)
 
 
