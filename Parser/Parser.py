@@ -21,12 +21,15 @@ def pars(champ, home, guest):
         home_tag = seria_a_transl[home]
         guest_tag = seria_a_transl[guest]
 
-    home_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/{champ_tag}/")
-    guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2023-2024/{champ_tag}/")
+    #home_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/{champ_tag}/")
+    home_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2024-2025/{champ_tag}/")
+    #guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2023-2024/{champ_tag}/")
+    guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2024-2025/{champ_tag}/")
     table_req = requests.get(f"https://www.sports.ru/football/tournament/{champ_tag}/table/")
-    pvp_req = requests.get("https://www.sports.ru/football/match/1675712/")
-    #pvp_req = requests.get(f"https://www.sports.ru/football/match/{home_tag}-vs-{guest_tag}/")
-    all_pvp_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/")
+    #pvp_req = requests.get("https://www.sports.ru/football/match/1672210/")
+    pvp_req = requests.get(f"https://www.sports.ru/football/match/{home_tag}-vs-{guest_tag}/")
+    #all_pvp_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/")
+    all_pvp_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2024-2025/")
 
     home_src = home_req.text
     guest_src = guest_req.text
@@ -40,45 +43,57 @@ def pars(champ, home, guest):
     pvp_soup = BeautifulSoup(pvp_src, 'lxml')
     all_pvp_soup = BeautifulSoup(all_pvp_src, 'lxml')
 
+    games_home_num = 0
+    home_games_home_num = 0
+    games_guest_num = 0
+    guest_games_guest_num = 0
+
     games_home = home_soup.find_all("td", string=["Дома", 'В гостях'])
-    games_home_num = len(games_home)
-    home_games_home = home_soup.find_all("td", string="Дома")
-    home_games_home_num = len(home_games_home)
+    for game_home in games_home:
+        if game_home.find_next_sibling('td', {'class': 'score-td'}).find('b'):
+            games_home_num += 1
+            if game_home.text == "Дома":
+                home_games_home_num += 1
 
     games_guest = guest_soup.find_all("td", string=["Дома", 'В гостях'])
-    games_guest_num = len(games_guest)
-    guest_games_guest = guest_soup.find_all("td", string="В гостях")
-    guest_games_guest_num = len(guest_games_guest)
+    for game_guest in games_guest:
+        if game_guest.find_next_sibling('td', {'class': 'score-td'}).find('b'):
+            games_guest_num += 1
+            if game_guest.text == "В гостях":
+                guest_games_guest_num += 1
 
     win_games_home = 0
     lose_games_home = 0
     draw_games_home = 0
 
-    for h_game in home_games_home:
-        w_result = h_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot gr-dot"})
-        if w_result != None:
-            win_games_home += 1
-        l_result = h_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot rd-dot"})
-        if l_result != None:
-            lose_games_home += 1
-        d_result = h_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot yw-dot"})
-        if d_result != None:
-            draw_games_home += 1
+    for game_home in games_home:
+        if game_home.text == "Дома":
+            w_result = game_home.find_next_sibling().find_next_sibling().find("a", {"class": "dot gr-dot"})
+            if w_result != None:
+                win_games_home += 1
+            l_result = game_home.find_next_sibling().find_next_sibling().find("a", {"class": "dot rd-dot"})
+            if l_result != None:
+                lose_games_home += 1
+            d_result = game_home.find_next_sibling().find_next_sibling().find("a", {"class": "dot yw-dot"})
+            if d_result != None:
+                draw_games_home += 1
+
 
     win_games_guest = 0
     lose_games_guest = 0
     draw_games_guest = 0
 
-    for g_game in guest_games_guest:
-        w_result = g_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot gr-dot"})
-        if w_result != None:
-            win_games_guest += 1
-        l_result = g_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot rd-dot"})
-        if l_result != None:
-            lose_games_guest += 1
-        d_result = g_game.find_next_sibling().find_next_sibling().find("a", {"class": "dot yw-dot"})
-        if d_result != None:
-            draw_games_guest += 1
+    for game_guest in games_guest:
+        if game_guest.text == "В гостях":
+            w_result = game_guest.find_next_sibling().find_next_sibling().find("a", {"class": "dot gr-dot"})
+            if w_result != None:
+                win_games_guest += 1
+            l_result = game_guest.find_next_sibling().find_next_sibling().find("a", {"class": "dot rd-dot"})
+            if l_result != None:
+                lose_games_guest += 1
+            d_result = game_guest.find_next_sibling().find_next_sibling().find("a", {"class": "dot yw-dot"})
+            if d_result != None:
+                draw_games_guest += 1
 
     home_scores = win_games_home*3 + draw_games_home
     guest_scores = win_games_guest*3 + draw_games_guest
@@ -109,14 +124,16 @@ def pars(champ, home, guest):
     miss = 0
 
     for pvp in all_pvp:
-        score = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('b').text
-        check = pvp.find_parent('td').find_next_sibling('td', {'class': 'alRight padR20'}).text
-        if check == "Дома":
-            goals += int(score[0])
-            miss += int(score[4])
-        else:
-            goals += int(score[4])
-            miss += int(score[0])
+        score_check = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('b')
+        if score_check:
+            score = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('a').text
+            check = pvp.find_parent('td').find_next_sibling('td', {'class': 'alRight padR20'}).text
+            if check == "Дома":
+                goals += int(score[0])
+                miss += int(score[4])
+            else:
+                goals += int(score[4])
+                miss += int(score[0])
 
 
     games = {"Матчи хозяев": games_home_num, "Матчи гостей": games_guest_num,
