@@ -2,7 +2,7 @@ from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.command import Command
-from Chat_Bot_3_0.keyboards.prof_keyboards import make_row_keyboard
+from keyboards.prof_keyboards import make_row_keyboard
 
 
 router = Router()
