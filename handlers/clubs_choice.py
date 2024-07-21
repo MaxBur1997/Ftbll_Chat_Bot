@@ -118,7 +118,7 @@ async def club_2_chosen(message: types.Message, state: FSMContext):
     else:
         if club_data['club1'] in clubs and message.text in clubs:
             await message.answer(f"Чемпионат: {club_data['champ']}\n"
-                                 f"Команда хоязев: {club_data['club1']}\n"
+                                 f"Команда хозяев: {club_data['club1']}\n"
                                  f"Команда гостей: {message.text}\n"
                                  "Выбор команд завершен. Чтобы продолжить нажмите на кнопку 'Получить данные'",
                                  reply_markup=kb1)
@@ -142,16 +142,19 @@ async def cmd_pars(message: types.Message, state: FSMContext):
                          f"Место гостей в турнирной таблице: {res_pars[5]}\n"
                          f"Количество очков хозяев, набранных в домашних матчах: {res_pars[6]}\n"
                          f"Количество очков гостей, набранных в гостевых матчах: {res_pars[7]}\n"
-                         f"Количество матчей хозяев: {res_pars[8]}, из них:\n"
-                         f"- сыграно дома: {res_pars[10]}, где\n"
-                         f"\t {res_pars[12]} - победы\n"
-                         f"\t {res_pars[13]} - проигрыши\n"
-                         f"\t {res_pars[14]} - ничьи\n"
-                         f"Количество матчей гостей: {res_pars[9]}, из них:\n"
-                         f"- сыграно в гостях: {res_pars[11]}, где\n"
-                         f"\t {res_pars[15]} - победы\n"
-                         f"\t {res_pars[16]} - проигрыши\n"
-                         f"\t {res_pars[17]} - ничьи\n"
-                         f"В личных встречах хозяева забили {res_pars[18]} и пропустили {res_pars[19]} мячей",
+                         f"Количество матчей хозяев: {res_pars[8]}\n"
+                         f"\t\tиз них:\n"
+                         f"\t\t\t\t- сыграно дома: {res_pars[10]}\n"
+                         f"\t\t\t\t\t\t {res_pars[12]} - победы\n"
+                         f"\t\t\t\t\t\t {res_pars[13]} - проигрыши\n"
+                         f"\t\t\t\t\t\t {res_pars[14]} - ничьи\n"
+                         f"Количество матчей гостей: {res_pars[9]}\n"
+                         f"\t\tиз них:\n"
+                         f"\t\t\t\t- сыграно в гостях: {res_pars[11]}\n"
+                         f"\t\t\t\t\t\t {res_pars[15]} - победы\n"
+                         f"\t\t\t\t\t\t {res_pars[16]} - проигрыши\n"
+                         f"\t\t\t\t\t\t {res_pars[17]} - ничьи\n"
+                         f"В личных встречах хозяева забили {res_pars[18]} и пропустили {res_pars[19]} мячей"
+                         f"Чтобы начать заново введите команду /start",
                          reply_markup=types.ReplyKeyboardRemove())
     await state.clear()
