@@ -27,14 +27,14 @@ clubs_apl = [
     "Астон Вилла",
     "Брентфорд",
     "Брайтон",
-    "Кристал Пелас",
+    "Кристал Пэлас",
     "Эвертон",
     "Фулхэм",
     "Ипсвич",
     "Лестер",
     "Манчестер Юнайтед",
     "Ньюкасл",
-    "Ноттенгем Форест",
+    "Ноттингем Форест",
     "Саутгемптон",
     "Тоттенхэм",
     "Вест Хэм",
@@ -90,7 +90,21 @@ clubs_bundes = [
     "Бавария",
     "Боруссия Д",
     "Байер",
-    "Штутгарт"
+    "Штутгарт",
+    "Аугсбург",
+    "Бохум",
+    "Боруссия М",
+    "Айнтрахт Ф",
+    "Фрайбург",
+    "Хайденхайм",
+    "Хоффенхайм",
+    "Хольштайн Киль",
+    "Майнц",
+    "РБ Лейпциг",
+    "Санкт-Паули",
+    "Унион Берлин",
+    "Вердер",
+    "Вольфсбург"
 ]
 
 class ChoiceProfile(StatesGroup):
@@ -123,7 +137,7 @@ async def champ_chosen(message: types.Message, state: FSMContext):
     if message.text == "Бундеслига":
         clubs = clubs_bundes
     await state.update_data(champ=message.text)
-    await message.answer("Выберите команду хозяев: ", reply_markup=make_row_keyboard(clubs))
+    await message.answer("Выберите команду хозяев: ", reply_markup=make_row_keyboard(sorted(clubs)))
     await state.set_state(ChoiceProfile.club_1)
 
 @router.message(ChoiceProfile.championship)
@@ -139,7 +153,7 @@ async def cmd_close(message: types.Message, state: FSMContext):
 @router.message(ChoiceProfile.club_1)
 async def club_1_chosen(message: types.Message, state: FSMContext):
     await state.update_data(club1=message.text)
-    await message.answer("Выберите команду гостей: ", reply_markup=make_row_keyboard(clubs))
+    await message.answer("Выберите команду гостей: ", reply_markup=make_row_keyboard(sorted(clubs)))
     await state.set_state(ChoiceProfile.club_2)
 
 @router.message(ChoiceProfile.club_2, F.text.lower() == 'закрыть')
@@ -201,7 +215,7 @@ async def cmd_pars(message: types.Message, state: FSMContext):
                          f"\t\t\t\t\t\t {res_pars[15]} - победы\n"
                          f"\t\t\t\t\t\t {res_pars[16]} - проигрыши\n"
                          f"\t\t\t\t\t\t {res_pars[17]} - ничьи\n"
-                         f"В личных встречах хозяева забили {res_pars[18]} и пропустили {res_pars[19]} мячей"
+                         f"В личных встречах хозяева забили {res_pars[18]} и пропустили {res_pars[19]} мячей\n"
                          f"Чтобы начать заново введите команду /start",
                          reply_markup=types.ReplyKeyboardRemove())
     await state.clear()

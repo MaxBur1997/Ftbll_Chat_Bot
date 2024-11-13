@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-from transliterate import translit
 from translit_file import *
 
 
@@ -26,8 +25,12 @@ def pars(champ, home, guest):
     #guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2023-2024/{champ_tag}/")
     guest_req = requests.get(f"https://www.sports.ru/football/club/{guest_tag}/calendar/2024-2025/{champ_tag}/")
     table_req = requests.get(f"https://www.sports.ru/football/tournament/{champ_tag}/table/")
-    #pvp_req = requests.get("https://www.sports.ru/football/match/1672210/")
-    pvp_req = requests.get(f"https://www.sports.ru/football/match/{home_tag}-vs-{guest_tag}/")
+    #pvp_req = requests.get(f"https://www.sports.ru/football/match/{home_tag}-vs-{guest_tag}/")
+    check_pvp = requests.get(f"https://www.sports.ru/football/match/{home_tag}-vs-{guest_tag}/")
+    if check_pvp != None:
+        pvp_req = check_pvp
+    else:
+        pvp_req = requests.get(f"https://www.sports.ru/football/match/{guest_tag}-vs-{home_tag}/")
     #all_pvp_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2023-2024/")
     all_pvp_req = requests.get(f"https://www.sports.ru/football/club/{home_tag}/calendar/2024-2025/")
 
@@ -95,19 +98,91 @@ def pars(champ, home, guest):
             if d_result != None:
                 draw_games_guest += 1
 
-    home_scores = win_games_home*3 + draw_games_home
-    guest_scores = win_games_guest*3 + draw_games_guest
+    find_last_five_games_home = home_soup.find('a', string='превью').find_parent('tr')
+
+    win_last_five_games_home = 0
+    draw_last_five_games_home = 0
+    lose_last_five_games_home = 0
+
+    last_five_games_home = find_last_five_games_home.find_previous_sibling()
+
+    i = 0
+
+    while i < 4:
+        find_win_home = last_five_games_home.find("a", {"class": "dot gr-dot"})
+        find_draw_home = last_five_games_home.find("a", {"class": "dot yw-dot"})
+        find_lose_home = last_five_games_home.find("a", {"class": "dot rd-dot"})
+
+        if find_win_home != None:
+            win_last_five_games_home += 1
+
+        if find_draw_home != None:
+            draw_last_five_games_home += 1
+
+        if find_lose_home != None:
+            lose_last_five_games_home += 1
+
+        last_five_games_home = last_five_games_home.find_previous_sibling()
+
+        if last_five_games_home == None:
+            break
+
+        i += 1
+
+    find_last_five_games_guest = guest_soup.find('a', string='превью').find_parent('tr')
+
+    win_last_five_games_guest = 0
+    draw_last_five_games_guest = 0
+    lose_last_five_games_guest = 0
+
+    last_five_games_guest = find_last_five_games_guest.find_previous_sibling()
+
+    i = 0
+
+    while i < 4:
+        find_win_guest = last_five_games_guest.find("a", {"class": "dot gr-dot"})
+        find_draw_guest = last_five_games_guest.find("a", {"class": "dot yw-dot"})
+        find_lose_guest = last_five_games_guest.find("a", {"class": "dot rd-dot"})
+
+        if find_win_guest != None:
+            win_last_five_games_guest += 1
+
+        if find_draw_guest != None:
+            draw_last_five_games_guest += 1
+
+        if find_lose_home != None:
+            lose_last_five_games_guest += 1
+
+        last_five_games_guest = last_five_games_guest.find_previous_sibling()
+
+        if last_five_games_guest == None:
+            break
+
+        i += 1
+
+    home_scores = win_last_five_games_home*3 + draw_last_five_games_home
+    guest_scores = win_last_five_games_guest*3 + draw_last_five_games_guest
 
     home_pos = table_soup.find("a", {'class': 'name'}, string=f"{home}").find_parent('td').find_previous_sibling().text
     guest_pos = table_soup.find("a", {'class': 'name'}, string=f"{guest}").find_parent('td').find_previous_sibling().text
 
-    sup_home = pvp_soup.find("div", string=' Не принимают участие ')
+    sup_home = pvp_soup.find("div", string='Не принимают участие')
+    if sup_home == None:
+        sup_home = pvp_soup.find("div", string=' Не принимают участие ')
+    # check_sup_home = sup_home.find_parent().find_next_sibling()
 
     if sup_home != None:
-        home_injuries = sup_home.find_parent().find_all('use',{'xlink:href': '#injury'})
-        home_disqualifications = sup_home.find_parent().find_all('use', {'xlink:href': '#disqualification'})
-        guest_injuries = sup_home.find_parent().find_next_sibling().find_all('use', {'xlink:href': '#injury'})
-        guest_disqualifications = sup_home.find_parent().find_next_sibling().find_all('use', {'xlink:href': '#disqualification'})
+        check_sup_home = sup_home.find_parent().find_next_sibling()
+        if check_sup_home != None:
+            home_injuries = sup_home.find_parent().find_all('use',{'xlink:href': '#injury'})
+            home_disqualifications = sup_home.find_parent().find_all('use', {'xlink:href': '#disqualification'})
+            guest_injuries = sup_home.find_parent().find_next_sibling().find_all('use', {'xlink:href': '#injury'})
+            guest_disqualifications = sup_home.find_parent().find_next_sibling().find_all('use', {'xlink:href': '#disqualification'})
+        else:
+            home_injuries = []
+            home_disqualifications = []
+            guest_injuries = sup_home.find_parent().find_all('use',{'xlink:href': '#injury'})
+            guest_disqualifications = sup_home.find_parent().find_all('use', {'xlink:href': '#disqualification'})
         home_inj_num = len(home_injuries)
         home_disq_num = len(home_disqualifications)
         guest_inj_num = len(guest_injuries)
@@ -126,7 +201,7 @@ def pars(champ, home, guest):
     for pvp in all_pvp:
         score_check = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('b')
         if score_check:
-            score = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('a').text
+            score = pvp.find_parent('td').find_next_sibling('td', {'class': 'score-td'}).find('a').find('b').text
             check = pvp.find_parent('td').find_next_sibling('td', {'class': 'alRight padR20'}).text
             if check == "Дома":
                 goals += int(score[0])
