@@ -6,7 +6,7 @@ from handlers import clubs_choice
 
 
 async def main():
-    API_TOKEN = config.token
+    API_TOKEN = config.TOKEN
 
     logging.basicConfig(level=logging.INFO)
 
