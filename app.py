@@ -1,12 +1,12 @@
+import os
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher
-import config
 from handlers import clubs_choice
 
 
 async def main():
-    API_TOKEN = config.TOKEN
+    API_TOKEN = os.getenv("BOT_TOKEN")
 
     logging.basicConfig(level=logging.INFO)
 
